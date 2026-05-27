@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Panel Coordinador | EPISC UPLA</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0d1b3e;--skyblue:#2196f3;--teal:#26a69a;--orange:#f5a623;--red:#e53935;--green:#43a047;--white:#fff;--gray:#f4f6fb;--text:#2d3748;--muted:#718096;--border:#e2e8f0;}
+body{font-family:'Nunito',sans-serif;background:var(--gray);color:var(--text);display:flex;min-height:100vh;}
+/* SIDEBAR */
+.sidebar{width:260px;min-height:100vh;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:1rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:.75rem;}
+.logo-mark{width:38px;height:38px;border-radius:8px;background:var(--teal);display:grid;place-items:center;font-size:1rem;color:#fff;flex-shrink:0;}
+.logo-name{color:#fff;font-size:.78rem;font-weight:700;line-height:1.3;}
+.logo-name small{color:rgba(255,255,255,.4);font-weight:400;font-size:.67rem;display:block;}
+.profile{padding:1.1rem 1rem;display:flex;flex-direction:column;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);}
+.avatar{width:76px;height:76px;border-radius:50%;object-fit:cover;margin-bottom:.6rem;border:3px solid rgba(255,255,255,.22);}
+.profile-name{color:#fff;font-weight:800;font-size:.82rem;text-align:center;}
+.profile-role{color:var(--teal);font-size:.72rem;font-weight:700;margin-top:.18rem;}
+.nav{flex:1;padding:.5rem 0;}
+.nav-section{padding:.5rem 1.3rem .15rem;color:rgba(255,255,255,.22);font-size:.63rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:.8rem;padding:.65rem 1.3rem;color:rgba(255,255,255,.58);font-size:.82rem;font-weight:600;text-decoration:none;border-left:3px solid transparent;transition:background .15s,color .15s;cursor:pointer;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff;}
+.nav-item.active{background:rgba(38,166,154,.2);color:#fff;border-left-color:var(--teal);}
+.nav-item i{width:17px;text-align:center;font-size:.84rem;}
+.badge-count{background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:.08rem .42rem;border-radius:999px;margin-left:auto;}
+/* MAIN */
+.main{margin-left:260px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 2rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.topbar-left{display:flex;align-items:center;gap:.6rem;font-size:.87rem;font-weight:700;}
+.topbar-right{display:flex;gap:.45rem;align-items:center;}
+.h-btn{width:33px;height:33px;border-radius:8px;border:none;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:.78rem;cursor:pointer;transition:background .15s;}
+.h-btn:hover{background:var(--teal);}
+.role-chip{background:rgba(38,166,154,.12);color:var(--teal);font-size:.69rem;font-weight:800;padding:.2rem .6rem;border-radius:6px;border:1px solid rgba(38,166,154,.25);}
+.content{padding:1.5rem 2rem;flex:1;}
+/* TABS */
+.tab-nav{display:flex;gap:.3rem;margin-bottom:1.4rem;border-bottom:2px solid var(--border);padding-bottom:0;}
+.tab-btn{padding:.55rem 1.1rem;border:none;background:none;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:.4rem;transition:color .15s,border-color .15s;}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:#fff;border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.9rem;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.stat-icon{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;}
+.si-blue{background:rgba(33,150,243,.12);color:var(--skyblue);}
+.si-orange{background:rgba(245,166,35,.12);color:var(--orange);}
+.si-teal{background:rgba(38,166,154,.12);color:var(--teal);}
+.si-green{background:rgba(67,160,71,.12);color:var(--green);}
+.stat-val{font-size:1.5rem;font-weight:800;color:var(--navy);line-height:1;}
+.stat-label{font-size:.69rem;color:var(--muted);font-weight:600;margin-top:.15rem;}
+/* TABLE */
+.card{background:#fff;border-radius:14px;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden;margin-bottom:1.4rem;}
+.card-hdr{padding:.85rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-hdr h3{font-size:.9rem;font-weight:800;display:flex;align-items:center;gap:.5rem;}
+.search-bar{display:flex;align-items:center;gap:.5rem;background:var(--gray);border-radius:8px;padding:.35rem .8rem;font-size:.78rem;}
+.search-bar input{border:none;background:none;font-family:'Nunito',sans-serif;font-size:.78rem;outline:none;width:180px;color:var(--text);}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:var(--gray);font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;padding:.6rem 1rem;text-align:left;border-bottom:1px solid var(--border);}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(38,166,154,.04);}
+td{padding:.7rem 1rem;font-size:.8rem;vertical-align:middle;}
+.pill{display:inline-flex;align-items:center;gap:.3rem;font-size:.68rem;font-weight:700;padding:.2rem .65rem;border-radius:999px;}
+.pill-pending{background:rgba(245,166,35,.12);color:#b07700;}
+.pill-review{background:rgba(33,150,243,.12);color:#1565c0;}
+.pill-obs{background:rgba(229,57,53,.1);color:#c62828;}
+.pill-ok{background:rgba(67,160,71,.12);color:#2e7d32;}
+.pill-prog{background:rgba(38,166,154,.12);color:#00695c;}
+.btn{padding:.5rem 1rem;border-radius:8px;font-family:'Nunito',sans-serif;font-size:.77rem;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:.4rem;transition:opacity .15s,transform .1s;text-decoration:none;}
+.btn:hover{opacity:.85;transform:translateY(-1px);}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-sm{padding:.35rem .75rem;font-size:.72rem;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-orange{background:var(--orange);color:#fff;}
+/* MODAL REVISAR */
+.modal-overlay{position:fixed;inset:0;background:rgba(13,27,62,.6);z-index:999;display:none;place-items:center;padding:1rem;}
+.modal-overlay.show{display:grid;}
+.modal-xl{background:#fff;border-radius:16px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;animation:popIn .25s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+.modal-hdr{padding:.9rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-hdr h3{font-size:.95rem;font-weight:800;display:flex;align-items:center;gap:.5rem;}
+.modal-close{background:none;border:none;font-size:1.1rem;color:var(--muted);cursor:pointer;transition:color .15s;}
+.modal-close:hover{color:var(--red);}
+.modal-body{display:flex;flex:1;overflow:hidden;}
+.pdf-viewer{flex:1;background:#525659;display:flex;flex-direction:column;align-items:center;padding:1rem;overflow-y:auto;gap:.8rem;}
+.pdf-toolbar{width:100%;background:rgba(0,0,0,.4);border-radius:8px;padding:.5rem .9rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0;}
+.pdf-toolbar span{color:#fff;font-size:.72rem;font-weight:600;}
+.pdf-toolbar button{background:rgba(255,255,255,.15);border:none;color:#fff;padding:.28rem .65rem;border-radius:5px;font-size:.72rem;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;}
+.pdf-placeholder{background:#fff;border-radius:6px;overflow:hidden;width:100%;max-width:540px;box-shadow:0 4px 18px rgba(0,0,0,.35);}
+.pdf-page{background:#fff;padding:2rem;min-height:720px;display:flex;flex-direction:column;gap:.8rem;}
+.pdf-page h2{font-size:1rem;font-weight:800;color:var(--navy);text-align:center;border-bottom:2px solid var(--navy);padding-bottom:.5rem;}
+.pdf-page p{font-size:.73rem;color:var(--text);line-height:1.7;}
+.pdf-page .page-num{text-align:center;font-size:.65rem;color:var(--muted);margin-top:auto;padding-top:1rem;border-top:1px solid var(--border);}
+.review-panel{width:310px;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
+.rp-section{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);}
+.rp-section h4{font-size:.74rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.65rem;}
+.info-row{display:flex;justify-content:space-between;align-items:center;font-size:.76rem;padding:.22rem 0;}
+.info-row strong{color:var(--text);}
+.info-row span{color:var(--muted);}
+.comments-list{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.7rem;}
+.comment-item{background:var(--gray);border-radius:8px;padding:.6rem .8rem;}
+.comment-item .c-author{font-size:.68rem;font-weight:700;color:var(--teal);margin-bottom:.2rem;}
+.comment-item .c-text{font-size:.73rem;color:var(--text);line-height:1.5;}
+.comment-item .c-date{font-size:.63rem;color:var(--muted);margin-top:.2rem;}
+textarea.rp-input{width:100%;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.78rem;resize:vertical;min-height:80px;outline:none;transition:border-color .15s;}
+textarea.rp-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(38,166,154,.1);}
+.rp-actions{padding:.9rem 1.1rem;display:flex;flex-direction:column;gap:.55rem;margin-top:auto;}
+.rp-actions .btn{width:100%;justify-content:center;}
+/* MODAL CONFIRM */
+.modal-sm{background:#fff;border-radius:16px;padding:1.8rem;max-width:370px;width:90%;text-align:center;animation:popIn .25s ease;}
+.m-icon{width:52px;height:52px;border-radius:50%;margin:0 auto .7rem;display:grid;place-items:center;font-size:1.4rem;}
+.m-icon.green{background:rgba(67,160,71,.12);color:var(--green);}
+.m-icon.red{background:rgba(229,57,53,.1);color:var(--red);}
+.modal-sm h3{font-size:.97rem;font-weight:800;margin-bottom:.35rem;}
+.modal-sm p{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+.modal-sm .btn-row{display:flex;gap:.6rem;justify-content:center;}
+footer.foot{background:#fff;border-top:1px solid var(--border);padding:.7rem 2rem;display:flex;justify-content:space-between;font-size:.71rem;color:var(--muted);}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><i class="fas fa-chalkboard-teacher"></i></div>
+    <div class="logo-name">UPLA – EPISC<small>Panel Coordinador</small></div>
+  </div>
+  <div class="profile">
+    <img src="data:image/avif;base64,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" style="width:76px;height:76px;border-radius:50%;object-fit:cover;object-position:top center;margin-bottom:.7rem;border:3px solid rgba(255,255,255,.22);" alt="Coordinador"/>
+    <div class="profile-name">Mg. ALEX ZÚÑIGA MANRIQUE</div>
+    <div class="profile-role"><i class="fas fa-circle" style="font-size:.5rem;margin-right:.3rem;"></i>Coordinador Académico</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Panel</div>
+    <a class="nav-item active" onclick="showTab('tab-informes',this)"><i class="fas fa-file-alt"></i> Revisar Informes <span class="badge-count" id="badge-pend">3</span></a>
+    <a class="nav-item" onclick="showTab('tab-sustentacion',this)"><i class="fas fa-calendar-alt"></i> Programar Sustentación</a>
+    <a class="nav-item" onclick="showTab('tab-resultados',this)"><i class="fas fa-star"></i> Registrar Resultado</a>
+    <a class="nav-item" onclick="showTab('tab-overview',this)"><i class="fas fa-chart-bar"></i> Resumen General</a>
+    <a class="nav-item" onclick="showTab('tab-horario',this)"><i class="fas fa-clock"></i> Configurar Horario</a>
+    <div class="nav-section">Sesión</div>
+    <a class="nav-item" href="../login.html" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-chip"><i class="fas fa-chalkboard-teacher"></i> Coordinador</span>
+      <span id="tab-title">CU05 – Revisar Informes</span>
+    </div>
+    <div class="topbar-right">
+      <button class="h-btn" title="Notificaciones"><i class="fas fa-bell"></i></button>
+      <button class="h-btn" onclick="window.location.href='../login.html';localStorage.clear()" title="Salir"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon si-blue"><i class="fas fa-inbox"></i></div><div><div class="stat-val" id="st-total">7</div><div class="stat-label">Solicitudes activas</div></div></div>
+      <div class="stat-card"><div class="stat-icon si-orange"><i class="fas fa-hourglass-half"></i></div><div><div class="stat-val" id="st-pend">3</div><div class="stat-label">Informes pendientes</div></div></div>
+      <div class="stat-card"><div class="stat-icon si-teal"><i class="fas fa-calendar-check"></i></div><div><div class="stat-val" id="st-prog">2</div><div class="stat-label">Sustentaciones prog.</div></div></div>
+      <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-check-double"></i></div><div><div class="stat-val" id="st-done">2</div><div class="stat-label">Resultados registrados</div></div></div>
+    </div>
+
+    <!-- TAB: REVISAR INFORMES -->
+    <div class="tab-panel active" id="tab-informes">
+      <div class="card">
+        <div class="card-hdr">
+          <h3><i class="fas fa-file-alt" style="color:var(--teal)"></i> Informes pendientes de revisión</h3>
+          <div class="search-bar"><i class="fas fa-search" style="color:var(--muted)"></i><input type="text" placeholder="Buscar estudiante..." oninput="filterTable(this.value)"/></div>
+        </div>
+        <div class="table-wrap">
+          <table id="tabla-informes">
+            <thead><tr><th>Código</th><th>Estudiante</th><th>Taller</th><th>Informe</th><th>Fecha envío</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-informes"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PROGRAMAR SUSTENTACIÓN -->
+    <div class="tab-panel" id="tab-sustentacion">
+      <div class="card">
+        <div class="card-hdr"><h3><i class="fas fa-calendar-alt" style="color:var(--skyblue)"></i> CU06 – Programar Sustentación</h3></div>
+        <div style="padding:1.3rem 1.4rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Seleccionar solicitud aprobada</label>
+              <select id="sel-sol" style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;">
+                <option value="">-- Selecciona una solicitud --</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Aula / Sala</label>
+              <input type="text" id="inp-aula" placeholder="Ej. Aula 302 – Lab. Sistemas" style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;"/>
+            </div>
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Fecha de sustentación</label>
+              <input type="date" id="inp-fecha" style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;"/>
+            </div>
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Hora</label>
+              <input type="time" id="inp-hora" style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;"/>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-teal" onclick="programarSustentacion()"><i class="fas fa-calendar-plus"></i> Programar sustentación</button>
+          </div>
+          <div style="margin-top:1.3rem;">
+            <div style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:.7rem;">Sustentaciones programadas</div>
+            <div id="lista-sustentaciones"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: REGISTRAR RESULTADO -->
+    <div class="tab-panel" id="tab-resultados">
+      <div class="card">
+        <div class="card-hdr"><h3><i class="fas fa-star" style="color:var(--orange)"></i> CU07 – Registrar Resultado</h3></div>
+        <div style="padding:1.3rem 1.4rem;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Seleccionar solicitud sustentada</label>
+              <select id="sel-res" style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;">
+                <option value="">-- Selecciona una solicitud --</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Nota (0 – 20)</label>
+              <input type="number" id="inp-nota" min="0" max="20" placeholder="Ej. 16" style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" oninput="calcEstado()"/>
+            </div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <div id="estado-nota-preview" style="display:none;"></div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label style="font-size:.75rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.4rem;">Observaciones del jurado</label>
+            <textarea id="inp-obs-res" placeholder="Ingresa las observaciones del jurado evaluador..." style="width:100%;padding:.58rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;resize:vertical;min-height:90px;outline:none;"></textarea>
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-orange" onclick="registrarResultado()"><i class="fas fa-save"></i> Registrar resultado</button>
+          </div>
+          <div style="margin-top:1.3rem;">
+            <div style="font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:.7rem;">Resultados registrados</div>
+            <div id="lista-resultados"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div class="tab-panel" id="tab-overview">
+      <div class="card">
+        <div class="card-hdr"><h3><i class="fas fa-chart-bar" style="color:var(--skyblue)"></i> Resumen General de Solicitudes</h3></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Estudiante</th><th>Taller</th><th>Informe</th><th>Sustentación</th><th>Nota</th><th>Estado</th></tr></thead>
+            <tbody id="tbody-overview"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CONFIGURAR HORARIO -->
+    <div class="tab-panel" id="tab-horario">
+      <div class="card">
+        <div class="card-hdr"><h3><i class="fas fa-clock" style="color:var(--teal)"></i> Configurar Horario de Atención</h3></div>
+        <div style="padding:1.4rem 1.6rem;">
+          <div style="background:rgba(38,166,154,.07);border:1px solid rgba(38,166,154,.2);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1.2rem;font-size:.8rem;color:#00695c;">
+            <i class="fas fa-info-circle"></i> &nbsp;El horario que configures aquí se mostrará a los estudiantes en todas las páginas del sistema. Los cambios se aplican de inmediato.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.2rem;">
+            <div>
+              <div style="font-size:.74rem;font-weight:800;color:var(--muted);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.06em;">🗓 Lunes a Viernes</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;">
+                <div>
+                  <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Turno mañana – Inicio</label>
+                  <input type="time" id="h-lv-m-ini" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="08:00"/>
+                </div>
+                <div>
+                  <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Turno mañana – Fin</label>
+                  <input type="time" id="h-lv-m-fin" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="13:00"/>
+                </div>
+                <div>
+                  <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Turno tarde – Inicio</label>
+                  <input type="time" id="h-lv-t-ini" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="15:00"/>
+                </div>
+                <div>
+                  <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Turno tarde – Fin</label>
+                  <input type="time" id="h-lv-t-fin" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="18:00"/>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:.74rem;font-weight:800;color:var(--muted);margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.06em;">🗓 Sábados</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;">
+                <div>
+                  <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Inicio</label>
+                  <input type="time" id="h-sab-ini" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="08:00"/>
+                </div>
+                <div>
+                  <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Fin</label>
+                  <input type="time" id="h-sab-fin" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="15:00"/>
+                </div>
+              </div>
+              <div style="margin-top:.8rem;">
+                <label style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:600;cursor:pointer;">
+                  <input type="checkbox" id="h-dom-activo" style="width:16px;height:16px;"/> Habilitar atención los Domingos
+                </label>
+                <div id="h-dom-horario" style="display:none;margin-top:.6rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+                  <div>
+                    <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Inicio</label>
+                    <input type="time" id="h-dom-ini" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="08:00"/>
+                  </div>
+                  <div>
+                    <label style="font-size:.73rem;font-weight:700;color:var(--muted);display:block;margin-bottom:.3rem;">Fin</label>
+                    <input type="time" id="h-dom-fin" style="width:100%;padding:.5rem .7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;" value="12:00"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;">
+            <div id="horario-preview" style="font-size:.8rem;color:var(--muted);"></div>
+            <div style="display:flex;gap:.6rem;">
+              <button class="btn btn-outline" onclick="resetHorario()"><i class="fas fa-undo"></i> Restaurar por defecto</button>
+              <button class="btn btn-teal" onclick="guardarHorario()"><i class="fas fa-save"></i> Guardar horario</button>
+            </div>
+          </div>
+          <div id="horario-saved-msg" style="display:none;margin-top:.9rem;background:rgba(67,160,71,.1);border:1px solid rgba(67,160,71,.25);border-radius:8px;padding:.6rem 1rem;font-size:.8rem;color:#2e7d32;font-weight:700;">
+            <i class="fas fa-check-circle"></i> Horario guardado. Los estudiantes verán el nuevo horario de inmediato.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: REVISAR INFORME (PDF inline) -->
+<div class="modal-overlay" id="modal-revisar">
+  <div class="modal-xl">
+    <div class="modal-hdr">
+      <h3><i class="fas fa-file-pdf" style="color:var(--red)"></i> Revisar informe – <span id="modal-estudiante">—</span></h3>
+      <button class="modal-close" onclick="closeModal('modal-revisar')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <!-- PDF viewer simulado -->
+      <div class="pdf-viewer">
+        <div class="pdf-toolbar">
+          <button onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
+          <span>Página <span id="pg-curr">1</span> / <span id="pg-total">3</span></span>
+          <button onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
+          <span style="margin-left:auto"><i class="fas fa-file-pdf"></i> <span id="pdf-filename">informe.pdf</span></span>
+          <button onclick="alert('En producción el PDF se descarga desde el servidor.')"><i class="fas fa-download"></i> Descargar</button>
+        </div>
+        <div class="pdf-placeholder">
+          <div class="pdf-page" id="pdf-page-content"></div>
+        </div>
+      </div>
+      <!-- Panel de revisión -->
+      <div class="review-panel">
+        <div class="rp-section">
+          <h4>Datos del informe</h4>
+          <div class="info-row"><span>Estudiante</span><strong id="rp-estudiante">—</strong></div>
+          <div class="info-row"><span>Código</span><strong id="rp-codigo">—</strong></div>
+          <div class="info-row"><span>Taller</span><strong id="rp-taller">—</strong></div>
+          <div class="info-row"><span>Versión</span><strong id="rp-version">—</strong></div>
+          <div class="info-row"><span>Páginas</span><strong id="rp-paginas">—</strong></div>
+          <div class="info-row"><span>Enviado</span><strong id="rp-fecha">—</strong></div>
+        </div>
+        <div class="rp-section" style="flex:1;">
+          <h4>Comentarios</h4>
+          <div class="comments-list" id="comments-list"></div>
+          <textarea class="rp-input" id="nuevo-comentario" placeholder="Escribe un comentario u observación..."></textarea>
+          <button class="btn btn-outline btn-sm" style="margin-top:.5rem;width:100%;justify-content:center;" onclick="addComment()"><i class="fas fa-comment"></i> Agregar comentario</button>
+        </div>
+        <div class="rp-actions">
+          <button class="btn btn-red" onclick="decidir('observado')"><i class="fas fa-redo"></i> Solicitar corrección</button>
+          <button class="btn btn-green" onclick="decidir('aprobado')"><i class="fas fa-check"></i> Aprobar informe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal-sm">
+    <div class="m-icon" id="mc-icon"><i class="fas fa-check"></i></div>
+    <h3 id="mc-title">—</h3>
+    <p id="mc-msg">—</p>
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="closeModal('modal-confirm')">Cancelar</button>
+      <button class="btn" id="mc-btn" onclick="confirmAction()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Protección de acceso ──
+(function(){
+  const role = localStorage.getItem('episc_role');
+  if(role !== 'coordinador'){
+    window.location.replace('../login.html');
+  }
+})();
+
+// ── DATOS DEMO ──────────────────────────────────────────────────────────────
+const DEMO=[
+  {id:'SOL-001',codigo:'Q01177E',estudiante:'Brandon Santillán Trujillo',taller:'Taller I – Diseño Gráfico Digital I',docente:'Mg. Alex Albert Zúñiga Manrique',informe:'informe_dg1_v1.pdf',version:'v1',paginas:14,fecha:'20/05/2026',estado:'Pendiente revisión',nota:null,obs:'',sustentacion:null},
+  {id:'SOL-002',codigo:'Q01205A',estudiante:'Fiorella Quispe Huamán',taller:'Taller V – Desarrollo de Apps I',docente:'Lic. Karina Luz Cruz Oscanoa',informe:'informe_apps1_v2.pdf',version:'v2',paginas:18,fecha:'18/05/2026',estado:'Pendiente revisión',nota:null,obs:'',sustentacion:null},
+  {id:'SOL-003',codigo:'Q01188C',estudiante:'Rodrigo Tapia Ccanto',taller:'Taller VII – Desarrollo de Aplicaciones I',docente:'Ing. Raul Enrique Fernandez Bejarano',informe:'informe_app_v1.pdf',version:'v1',paginas:11,fecha:'21/05/2026',estado:'Pendiente revisión',nota:null,obs:'',sustentacion:null},
+  {id:'SOL-004',codigo:'Q01150B',estudiante:'María Flores Ríos',taller:'Taller III – Diseño Web I',docente:'Mg. Alex Albert Zúñiga Manrique',informe:'informe_web1_v3.pdf',version:'v3',paginas:20,fecha:'15/05/2026',estado:'Aprobado',nota:null,obs:'',sustentacion:{fecha:'28/05/2026',hora:'10:00',aula:'Lab. 302'}},
+  {id:'SOL-005',codigo:'Q01133D',estudiante:'Carlos Meza Vilcas',taller:'Taller IX – Sistema de Cableado Estructurado',docente:'Ing. Carlos Felix Quispe Reyes',informe:'informe_cable_v1.pdf',version:'v1',paginas:9,fecha:'14/05/2026',estado:'Observado',nota:null,obs:'Falta sección de conclusiones.',sustentacion:null},
+  {id:'SOL-006',codigo:'Q01090F',estudiante:'Lucia Huanca Torres',taller:'Taller X – Redes Inalámbricas',docente:'Ing. Carlos Felix Quispe Reyes',informe:'informe_redes2_v2.pdf',version:'v2',paginas:16,fecha:'12/05/2026',estado:'Aprobado',nota:17,obs:'Excelente trabajo.',sustentacion:{fecha:'26/05/2026',hora:'09:00',aula:'Aula 201'}},
+  {id:'SOL-007',codigo:'Q01044G',estudiante:'Javier Paucar Rivas',taller:'Taller XI – Sistemas Operativos para Servidores I',docente:'Ing. John Fredy Rojas Bujaico',informe:'informe_serv_v1.pdf',version:'v1',paginas:13,fecha:'10/05/2026',estado:'Aprobado',nota:15,obs:'Buen dominio del tema.',sustentacion:{fecha:'24/05/2026',hora:'11:00',aula:'Lab. 302'}},
+];
+let solicitudes=JSON.parse(localStorage.getItem('coord_solicitudes')||'null')||DEMO;
+let currentRow=null;
+let pendingAction=null;
+let currentPage=1;
+const pages=[
+  {title:'Caratula',text:'UNIVERSIDAD PERUANA LOS ANDES\nEscuela Profesional de Ingeniería de Sistemas y Computación\n\nINFORME TÉCNICO DE TALLER\n\nEstudiante: Brandon Santillán Trujillo\nCódigo: Q01177E\nTaller: Taller I – Diseño Gráfico Digital I\nDocente: Mg. Alex Albert Zúñiga Manrique\nFecha: Mayo 2026'},
+  {title:'Desarrollo técnico',text:'1. INTRODUCCIÓN\nEl presente informe describe las actividades realizadas durante el Taller I de Diseño Gráfico Digital I, abarcando los fundamentos de diseño, manejo de herramientas digitales y edición gráfica.\n\n2. OBJETIVOS\n• Dominar las herramientas básicas de diseño gráfico digital.\n• Crear composiciones visuales con técnicas profesionales.\n• Aplicar principios de color, tipografía y diagramación.\n\n3. MARCO TEÓRICO\nEl diseño gráfico digital comprende el uso de herramientas de software especializadas para la creación, edición y maquetación de piezas visuales. Las aplicaciones más utilizadas incluyen Adobe Photoshop, Illustrator y Canva...'},
+  {title:'Conclusiones y referencias',text:'4. CONCLUSIONES\n• Se logró comprender el funcionamiento del microcontrolador ATmega328P.\n• Se implementaron 5 proyectos prácticos con sensores de temperatura, ultrasonido y LEDs.\n• El uso de librerías externas agilizó el desarrollo de los proyectos.\n\n5. REFERENCIAS\n[1] Banzi, M. (2011). Getting Started with Arduino. O\'Reilly.\n[2] McRoberts, M. (2013). Beginning Arduino. Apress.\n[3] Documentación oficial: https://www.arduino.cc/reference/'},
+];
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function save(){localStorage.setItem('coord_solicitudes',JSON.stringify(solicitudes));}
+function renderAll(){renderInformes();renderSustSelects();renderSustLista();renderResultLista();renderOverview();updateStats();}
+function updateStats(){
+  document.getElementById('st-total').textContent=solicitudes.length;
+  document.getElementById('st-pend').textContent=solicitudes.filter(s=>s.estado==='Pendiente revisión').length;
+  document.getElementById('badge-pend').textContent=solicitudes.filter(s=>s.estado==='Pendiente revisión').length;
+  document.getElementById('st-prog').textContent=solicitudes.filter(s=>s.sustentacion&&!s.nota).length;
+  document.getElementById('st-done').textContent=solicitudes.filter(s=>s.nota!=null).length;
+}
+function pillHtml(estado){
+  const map={
+    'Pendiente revisión':'pill-pending','Aprobado':'pill-ok','Observado':'pill-obs',
+    'Sustentación prog.':'pill-prog','Desaprobado':'pill-obs'
+  };
+  return `<span class="pill ${map[estado]||'pill-pending'}">${estado}</span>`;
+}
+function renderInformes(){
+  const tbody=document.getElementById('tbody-informes');
+  const rows=solicitudes.filter(s=>['Pendiente revisión','Observado','Aprobado'].includes(s.estado));
+  tbody.innerHTML=rows.map(r=>`
+    <tr data-id="${r.id}">
+      <td><strong>${r.id}</strong></td>
+      <td>${r.estudiante}<br><small style="color:var(--muted)">${r.codigo}</small></td>
+      <td>${r.taller}</td>
+      <td><i class="fas fa-file-pdf" style="color:var(--red)"></i> ${r.informe}</td>
+      <td>${r.fecha}</td>
+      <td>${pillHtml(r.estado)}</td>
+      <td>
+        <button class="btn btn-teal btn-sm" onclick="abrirRevisar('${r.id}')"><i class="fas fa-eye"></i> Revisar</button>
+      </td>
+    </tr>`).join('');
+}
+function filterTable(q){
+  document.querySelectorAll('#tbody-informes tr').forEach(tr=>{
+    tr.style.display=tr.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+  });
+}
+function renderSustSelects(){
+  const aprobados=solicitudes.filter(s=>s.estado==='Aprobado'&&!s.sustentacion);
+  document.getElementById('sel-sol').innerHTML='<option value="">-- Selecciona una solicitud --</option>'+
+    aprobados.map(s=>`<option value="${s.id}">[${s.id}] ${s.estudiante} – ${s.taller}</option>`).join('');
+  const conSust=solicitudes.filter(s=>s.sustentacion&&!s.nota);
+  document.getElementById('sel-res').innerHTML='<option value="">-- Selecciona una solicitud --</option>'+
+    conSust.map(s=>`<option value="${s.id}">[${s.id}] ${s.estudiante} – ${s.taller}</option>`).join('');
+}
+function renderSustLista(){
+  const el=document.getElementById('lista-sustentaciones');
+  const list=solicitudes.filter(s=>s.sustentacion);
+  if(!list.length){el.innerHTML='<div style="font-size:.78rem;color:var(--muted);text-align:center;padding:.6rem">Sin sustentaciones programadas aún.</div>';return;}
+  el.innerHTML=list.map(s=>`
+    <div style="display:flex;align-items:center;gap:.8rem;padding:.65rem;background:var(--gray);border-radius:8px;margin-bottom:.45rem;font-size:.78rem;">
+      <i class="fas fa-calendar-check" style="color:var(--teal);font-size:1.1rem;"></i>
+      <div style="flex:1"><strong>${s.estudiante}</strong> – ${s.taller}<br>
+      <span style="color:var(--muted)">${s.sustentacion.fecha} · ${s.sustentacion.hora} · ${s.sustentacion.aula}</span></div>
+      ${pillHtml(s.nota!=null?(s.nota>=13?'Aprobado':'Desaprobado'):'Sustentación prog.')}
+    </div>`).join('');
+}
+function renderResultLista(){
+  const el=document.getElementById('lista-resultados');
+  const list=solicitudes.filter(s=>s.nota!=null);
+  if(!list.length){el.innerHTML='<div style="font-size:.78rem;color:var(--muted);text-align:center;padding:.6rem">Sin resultados registrados aún.</div>';return;}
+  el.innerHTML=list.map(s=>`
+    <div style="display:flex;align-items:center;gap:.8rem;padding:.65rem;background:var(--gray);border-radius:8px;margin-bottom:.45rem;font-size:.78rem;">
+      <div style="width:42px;height:42px;border-radius:50%;background:${s.nota>=13?'rgba(67,160,71,.15)':'rgba(229,57,53,.1)'};display:grid;place-items:center;font-size:1.1rem;font-weight:800;color:${s.nota>=13?'var(--green)':'var(--red)'};flex-shrink:0">${s.nota}</div>
+      <div style="flex:1"><strong>${s.estudiante}</strong> – ${s.taller}<br>
+      <span style="color:var(--muted);font-size:.71rem">${s.obs||'Sin observaciones'}</span></div>
+      ${pillHtml(s.nota>=13?'Aprobado':'Desaprobado')}
+    </div>`).join('');
+}
+function renderOverview(){
+  const tbody=document.getElementById('tbody-overview');
+  tbody.innerHTML=solicitudes.map(s=>`
+    <tr>
+      <td><strong>${s.id}</strong></td>
+      <td>${s.estudiante}<br><small style="color:var(--muted)">${s.codigo}</small></td>
+      <td>${s.taller}</td>
+      <td>${s.informe?'<i class="fas fa-check" style="color:var(--green)"></i>':'<i class="fas fa-times" style="color:var(--muted)"></i>'}</td>
+      <td>${s.sustentacion?s.sustentacion.fecha+' '+s.sustentacion.hora:'—'}</td>
+      <td>${s.nota!=null?`<strong style="color:${s.nota>=13?'var(--green)':'var(--red)'}">${s.nota}</strong>`:'—'}</td>
+      <td>${pillHtml(s.nota!=null?(s.nota>=13?'Aprobado':'Desaprobado'):s.estado)}</td>
+    </tr>`).join('');
+}
+
+// ── MODAL REVISAR ─────────────────────────────────────────────────────────────
+function abrirRevisar(id){
+  currentRow=solicitudes.find(s=>s.id===id);
+  if(!currentRow)return;
+  document.getElementById('modal-estudiante').textContent=currentRow.estudiante;
+  document.getElementById('rp-estudiante').textContent=currentRow.estudiante;
+  document.getElementById('rp-codigo').textContent=currentRow.codigo;
+  document.getElementById('rp-taller').textContent=currentRow.taller;
+  document.getElementById('rp-version').textContent=currentRow.version;
+  document.getElementById('rp-paginas').textContent=currentRow.paginas+' pág.';
+  document.getElementById('rp-fecha').textContent=currentRow.fecha;
+  document.getElementById('pdf-filename').textContent=currentRow.informe;
+  currentPage=1;renderPage();
+  renderComments();
+  document.getElementById('nuevo-comentario').value='';
+  document.getElementById('modal-revisar').classList.add('show');
+}
+function renderPage(){
+  const pg=pages[currentPage-1]||pages[0];
+  document.getElementById('pg-curr').textContent=currentPage;
+  document.getElementById('pg-total').textContent=pages.length;
+  document.getElementById('pdf-page-content').innerHTML=`<h2>${pg.title}</h2>${pg.text.split('\n').map(l=>l?`<p>${l}</p>`:'').join('')}<div class="page-num">Página ${currentPage} de ${pages.length}</div>`;
+}
+function changePage(d){currentPage=Math.max(1,Math.min(pages.length,currentPage+d));renderPage();}
+function renderComments(){
+  const comments=JSON.parse(localStorage.getItem('coord_comments_'+currentRow.id)||'[]');
+  const el=document.getElementById('comments-list');
+  if(currentRow.obs)comments.unshift({author:'Sistema',text:currentRow.obs,date:currentRow.fecha});
+  el.innerHTML=comments.length?comments.map(c=>`
+    <div class="comment-item">
+      <div class="c-author"><i class="fas fa-user-tie"></i> ${c.author}</div>
+      <div class="c-text">${c.text}</div>
+      <div class="c-date">${c.date}</div>
+    </div>`).join(''):'<div style="font-size:.75rem;color:var(--muted)">Sin comentarios aún.</div>';
+}
+function addComment(){
+  const txt=document.getElementById('nuevo-comentario').value.trim();
+  if(!txt||!currentRow)return;
+  const key='coord_comments_'+currentRow.id;
+  const arr=JSON.parse(localStorage.getItem(key)||'[]');
+  arr.push({author:'Coord. Zúñiga',text:txt,date:new Date().toLocaleDateString('es-PE')});
+  localStorage.setItem(key,JSON.stringify(arr));
+  document.getElementById('nuevo-comentario').value='';
+  renderComments();
+}
+function decidir(accion){
+  pendingAction=accion;
+  const isOk=accion==='aprobado';
+  const ic=document.getElementById('mc-icon');
+  ic.className='m-icon '+(isOk?'green':'red');
+  ic.innerHTML=isOk?'<i class="fas fa-check"></i>':'<i class="fas fa-redo"></i>';
+  document.getElementById('mc-title').textContent=isOk?'¿Aprobar informe?':'¿Solicitar corrección?';
+  document.getElementById('mc-msg').textContent=isOk?`Confirma que el informe de ${currentRow.estudiante} cumple los requisitos y puede proceder a sustentación.`:`El estudiante ${currentRow.estudiante} será notificado para corregir y reenviar su informe.`;
+  const btn=document.getElementById('mc-btn');
+  btn.className='btn '+(isOk?'btn-green':'btn-red');
+  btn.textContent=isOk?'Sí, aprobar':'Sí, solicitar corrección';
+  document.getElementById('modal-confirm').classList.add('show');
+}
+function confirmAction(){
+  if(!currentRow||!pendingAction)return;
+  currentRow.estado=pendingAction==='aprobado'?'Aprobado':'Observado';
+  save();renderAll();
+  closeModal('modal-confirm');closeModal('modal-revisar');
+}
+// ── PROGRAMAR SUSTENTACIÓN ────────────────────────────────────────────────────
+function programarSustentacion(){
+  const id=document.getElementById('sel-sol').value;
+  const fecha=document.getElementById('inp-fecha').value;
+  const hora=document.getElementById('inp-hora').value;
+  const aula=document.getElementById('inp-aula').value.trim();
+  if(!id||!fecha||!hora||!aula){alert('Completa todos los campos.');return;}
+  const sol=solicitudes.find(s=>s.id===id);
+  sol.sustentacion={fecha:new Date(fecha).toLocaleDateString('es-PE'),hora,aula};
+  sol.estado='Sustentación prog.';
+  save();renderAll();
+  document.getElementById('sel-sol').value='';
+  document.getElementById('inp-fecha').value='';
+  document.getElementById('inp-hora').value='';
+  document.getElementById('inp-aula').value='';
+  alert('✅ Sustentación programada correctamente. El estudiante será notificado.');
+}
+// ── REGISTRAR RESULTADO ───────────────────────────────────────────────────────
+function calcEstado(){
+  const n=parseInt(document.getElementById('inp-nota').value);
+  const el=document.getElementById('estado-nota-preview');
+  if(isNaN(n)||n<0||n>20){el.style.display='none';return;}
+  el.style.display='block';
+  const ok=n>=13;
+  el.innerHTML=`<div style="background:${ok?'rgba(67,160,71,.1)':'rgba(229,57,53,.08)'};border:1px solid ${ok?'rgba(67,160,71,.25)':'rgba(229,57,53,.2)'};border-radius:8px;padding:.55rem .9rem;font-size:.8rem;font-weight:700;color:${ok?'var(--green)':'var(--red)'};">
+    <i class="fas fa-${ok?'check-circle':'times-circle'}"></i> Nota: ${n}/20 → ${ok?'APROBADO':'DESAPROBADO'} (mínimo aprobatorio: 13)
+  </div>`;
+}
+function registrarResultado(){
+  const id=document.getElementById('sel-res').value;
+  const nota=parseInt(document.getElementById('inp-nota').value);
+  const obs=document.getElementById('inp-obs-res').value.trim();
+  if(!id){alert('Selecciona una solicitud.');return;}
+  if(isNaN(nota)||nota<0||nota>20){alert('Ingresa una nota válida entre 0 y 20.');return;}
+  const sol=solicitudes.find(s=>s.id===id);
+  sol.nota=nota;sol.obs=obs;
+  sol.estado=nota>=13?'Aprobado':'Desaprobado';
+  save();renderAll();
+  document.getElementById('sel-res').value='';
+  document.getElementById('inp-nota').value='';
+  document.getElementById('inp-obs-res').value='';
+  document.getElementById('estado-nota-preview').style.display='none';
+  alert(`✅ Resultado registrado: ${nota}/20 – ${nota>=13?'APROBADO':'DESAPROBADO'}.`);
+}
+// ── TABS ──────────────────────────────────────────────────────────────────────
+const TAB_TITLES={'tab-informes':'CU05 – Revisar Informes','tab-sustentacion':'CU06 – Programar Sustentación','tab-resultados':'CU07 – Registrar Resultado','tab-overview':'Resumen General','tab-horario':'⚙ Configurar Horario de Atención'};
+function showTab(id,el){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('tab-title').textContent=TAB_TITLES[id]||'';
+  if(el) el.classList.add('active');
+}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+// ── HORARIO ───────────────────────────────────────────────────────────────────
+const DEFAULT_HORARIO={lvMIni:'08:00',lvMFin:'13:00',lvTIni:'15:00',lvTFin:'18:00',sabIni:'08:00',sabFin:'15:00',domActivo:false,domIni:'08:00',domFin:'12:00'};
+function loadHorarioForm(){
+  const h=JSON.parse(localStorage.getItem('episc_horario')||'null')||DEFAULT_HORARIO;
+  document.getElementById('h-lv-m-ini').value=h.lvMIni;
+  document.getElementById('h-lv-m-fin').value=h.lvMFin;
+  document.getElementById('h-lv-t-ini').value=h.lvTIni;
+  document.getElementById('h-lv-t-fin').value=h.lvTFin;
+  document.getElementById('h-sab-ini').value=h.sabIni;
+  document.getElementById('h-sab-fin').value=h.sabFin;
+  document.getElementById('h-dom-activo').checked=h.domActivo;
+  document.getElementById('h-dom-ini').value=h.domIni;
+  document.getElementById('h-dom-fin').value=h.domFin;
+  document.getElementById('h-dom-horario').style.display=h.domActivo?'grid':'none';
+  updateHorarioPreview(h);
+}
+function updateHorarioPreview(h){
+  const p=document.getElementById('horario-preview');
+  if(!p)return;
+  p.innerHTML=`<b>Horario actual:</b> Lun-Vie ${h.lvMIni}-${h.lvMFin} y ${h.lvTIni}-${h.lvTFin} · Sáb ${h.sabIni}-${h.sabFin}${h.domActivo?' · Dom '+h.domIni+'-'+h.domFin:''}`;
+}
+function guardarHorario(){
+  const h={
+    lvMIni:document.getElementById('h-lv-m-ini').value,
+    lvMFin:document.getElementById('h-lv-m-fin').value,
+    lvTIni:document.getElementById('h-lv-t-ini').value,
+    lvTFin:document.getElementById('h-lv-t-fin').value,
+    sabIni:document.getElementById('h-sab-ini').value,
+    sabFin:document.getElementById('h-sab-fin').value,
+    domActivo:document.getElementById('h-dom-activo').checked,
+    domIni:document.getElementById('h-dom-ini').value,
+    domFin:document.getElementById('h-dom-fin').value,
+  };
+  localStorage.setItem('episc_horario',JSON.stringify(h));
+  updateHorarioPreview(h);
+  const msg=document.getElementById('horario-saved-msg');
+  msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',3500);
+}
+function resetHorario(){
+  localStorage.removeItem('episc_horario');
+  loadHorarioForm();
+}
+document.addEventListener('change',function(e){
+  if(e.target.id==='h-dom-activo'){
+    document.getElementById('h-dom-horario').style.display=e.target.checked?'grid':'none';
+  }
+});
+
+window.onload=function(){renderAll();loadHorarioForm();};
+</script>
+</body>
+</html>
